@@ -84,12 +84,12 @@ jobs:
           /opt/gcc/host/bin/mipsel-linux-strip supernode
           /opt/gcc/host/bin/mipsel-linux-strip n2n-benchmark
           #压缩
-          /opt/upx-3.95-amd64_linux/upx edge
-          /opt/upx-3.95-amd64_linux/upx example_edge_embed
-          /opt/upx-3.95-amd64_linux/upx example_edge_embed_quick_edge_init
-          /opt/upx-3.95-amd64_linux/upx example_sn_embed
-          /opt/upx-3.95-amd64_linux/upx supernode
-          /opt/upx-3.95-amd64_linux/upx n2n-benchmark
+          /opt/upx-3.95-amd64_linux/upx --lzma --best edge
+          /opt/upx-3.95-amd64_linux/upx --lzma --best example_edge_embed
+          /opt/upx-3.95-amd64_linux/upx --lzma --best example_edge_embed_quick_edge_init
+          /opt/upx-3.95-amd64_linux/upx --lzma --best example_sn_embed
+          /opt/upx-3.95-amd64_linux/upx --lzma --best supernode
+          /opt/upx-3.95-amd64_linux/upx --lzma --best n2n-benchmark
           cd /opt
           tagtime=$(date '+%Y-%m-%d')
           echo "tagtime=$(date '+%Y-%m-%d')" >> $GITHUB_ENV
