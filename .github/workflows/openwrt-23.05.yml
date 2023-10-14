@@ -97,6 +97,8 @@ jobs:
           /opt/upx-3.95-amd64_linux/upx --lzma --best example_sn_embed
           /opt/upx-3.95-amd64_linux/upx --lzma --best supernode
           /opt/upx-3.95-amd64_linux/upx --lzma --best n2n-benchmark
+          echo 查看edge文件大小kb
+          du -k edge
           cd /opt
           tagtime=$(date '+%Y-%m-%d')
           echo "tagtime=$(date '+%Y-%m-%d')" >> $GITHUB_ENV
