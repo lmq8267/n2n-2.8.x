@@ -48,7 +48,7 @@ jobs:
           #sed -i '/# N2n release information/i set(CMAKE_CXX_FLAGS "${CMAKE_CXX_LINKER_FLAGS} -static")' ./CMakeLists.txt
           #sed -i '/# N2n release information/i set(CMAKE_C_EXE_LINKER_FLAGS "${CMAKE_C_EXE_LINKER_FLAGS} -static")' ./CMakeLists.txt
           #开始编译
-          export CC=mipsel-linux-gcc
+          export CC=/opt/gcc/host/bin/mipsel-linux-gcc
           cmake . .
           make
         continue-on-error: true
