@@ -43,7 +43,7 @@ jobs:
           sed -i '/# N2n release information/i set(CMAKE_CXX_COMPILER mipsel-linux-g++)' ./CMakeLists.txt
           #设置编译静态程序
           sed -i '/# N2n release information/i set(CMAKE_CXX_FLAGS "${CMAKE_CXX_LINKER_FLAGS} -static")' ./CMakeLists.txt
-          sed -i '/# N2n release information/i set(CMAKE_CXE_LINKER_FLAGS "${CMAKE_CEXE_LINKER_FLAGS} -static")' ./CMakeLists.txt
+          sed -i '/# N2n release information/i set(CMAKE_C_EXE_LINKER_FLAGS "${CMAKE_C_EXE_LINKER_FLAGS} -static")' ./CMakeLists.txt
           #开始编译
           cmake . .
           make
