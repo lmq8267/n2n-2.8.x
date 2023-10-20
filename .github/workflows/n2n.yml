@@ -36,19 +36,18 @@ jobs:
           #编译静态程序
           #sed -i 's|-Wshadow|-Wshadow -static |g' ./CMakeLists.txt
           #sed -i '/# N2n release information/i set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -L. -pthread -lrt -ldl")' ./CMakeLists.txt
-          sed -i '/# N2n release information/i set(CMAKE_EXE_LINKER_FLAGS "-static")' ./CMakeLists.txt
+          sed -i 's|-O2 -DNDEBUG|-O2 -DNDEBUG -static |g' ./CMakeLists.txt
           sed -i '/# N2n release information/i set(CMAKE_BUILD_TYPE Release)' ./CMakeLists.txt
           #设置编译平台
-          #sed -i '/# N2n release information/i set(CMAKE_SYSTEM_NAME Linux)' ./CMakeLists.txt
-          #sed -i '/# N2n release information/i set(CMAKE_SYSTEM_PROCESSOR mipsel)' ./CMakeLists.txt
+          sed -i '/# N2n release information/i set(CMAKE_SYSTEM_NAME Linux)' ./CMakeLists.txt
+          sed -i '/# N2n release information/i set(CMAKE_SYSTEM_PROCESSOR mipsel)' ./CMakeLists.txt
           #设置编译gcc
-          #sed -i '/# N2n release information/i set(CMAKE_C_COMPILER mipsel-linux-gcc)' ./CMakeLists.txt
-          #sed -i '/# N2n release information/i set(CMAKE_CXX_COMPILER mipsel-linux-g++)' ./CMakeLists.txt
+          sed -i '/# N2n release information/i set(CMAKE_C_COMPILER mipsel-linux-gcc)' ./CMakeLists.txt
+          sed -i '/# N2n release information/i set(CMAKE_CXX_COMPILER mipsel-linux-g++)' ./CMakeLists.txt
           #设置编译静态程序
           #sed -i '/# N2n release information/i set(CMAKE_CXX_FLAGS "${CMAKE_CXX_LINKER_FLAGS} -static")' ./CMakeLists.txt
           #sed -i '/# N2n release information/i set(CMAKE_C_EXE_LINKER_FLAGS "${CMAKE_C_EXE_LINKER_FLAGS} -static")' ./CMakeLists.txt
           #开始编译
-          export CC=/opt/gcc/host/bin/mipsel-linux-gcc
           cmake . .
           make
         continue-on-error: true
