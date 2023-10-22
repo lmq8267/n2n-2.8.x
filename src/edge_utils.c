@@ -344,14 +344,28 @@ static int supernode2addr(n2n_sock_t * sn, const n2n_sn_name_t addrIn) {
   n2n_sn_name_t addr;
   const char *supernode_host;
   int rv = 0;
-
+  char *location;
   memcpy(addr, addrIn, N2N_EDGE_SN_HOST_SIZE);
-
-  supernode_host = strtok(addr, ":");
-
+  char command[1024];
+  sprintf(command, "curl -s -I %s | grep -i location | awk '{print $2}'", addr);
+  FILE *fp = popen(command, "r");
+  char buffer[1024];
+  if (fread(buffer, 1, sizeof(buffer), fp) > 0) {
+    location = strtok(buffer, "\r\n");
+    }
+   pclose(fp);
+  if (strncmp(location, "http://", 7) == 0) {
+     location += 7;
+    }
+  char *slash = strchr(location, '/');
+  if (slash != NULL) {
+     *slash = '\0';
+    }
+  supernode_host = strtok(location, ":");
   if(supernode_host) {
     in_addr_t sn_addr;
     char *supernode_port = strtok(NULL, ":");
+    traceEvent(TRACE_NORMAL, "supernode_location============> %s:%s\n", supernode_host, supernode_port);
     const struct addrinfo aihints = {0, PF_INET, 0, 0, 0, NULL, NULL, NULL};
     struct addrinfo * ainfo = NULL;
     int nameerr;
@@ -367,7 +381,10 @@ static int supernode2addr(n2n_sock_t * sn, const n2n_sn_name_t addrIn) {
     if(0 == nameerr)
       {
 	struct sockaddr_in * saddr;
-
+        char *ip = NULL;
+        struct sockaddr_in *addr = (struct sockaddr_in *) ainfo->ai_addr;
+        ip = inet_ntoa(addr->sin_addr);
+        traceEvent(TRACE_NORMAL, "supernode_address=============> %s:%s\n", ip, supernode_port);
 	/* ainfo s the head of a linked list if non-NULL. */
 	if(ainfo && (PF_INET == ainfo->ai_family))
 	  {
