@@ -351,7 +351,6 @@ static int supernode2addr(n2n_sock_t * sn, const n2n_sn_name_t addrIn) {
     } else {
   char *location;
   char command[1024];
-  printf("supernode_aaddrr:::%s\n", addr);
   sprintf(command, "curl -s -I %s | grep -i location | awk '{print $2}'", addr);
    FILE *fp = popen(command, "r");
    char buffer[1024];
