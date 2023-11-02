@@ -1,0 +1,77 @@
+name: 编译android-hin2n
+
+on:
+   workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: 下载工具链
+        run: |
+          #下载jdk sdk ndk工具链
+          wget -c -q https://github.com/lmq8267/n2n-2.8.x/releases/download/toolchain/hin2n_byhj.tar.gz -P /opt/gcc/
+          tar -xf /opt/gcc/hin2n_byhj.tar.gz -C /opt/gcc/
+          #赋予权限以防需要权限
+          #sudo chmod 777 -R /opt/gcc/
+          #下载hin2n源码
+          git clone https://github.com/switch-iot/hin2n.git --depth=1 --recurse-submodules /opt/hin2n-android
+          #替换n2n源码
+          rm -rf /opt/hin2n-android/bundles/n2n_ntop_v2/src/edge_utils.c
+          wget -c -q https://github.com/lmq8267/n2n-2.8.x/releases/download/toolchain/edge_utils.c -P /opt/hin2n-android/bundles/n2n_ntop_v2/src/
+          cat /opt/hin2n-android/bundles/n2n_ntop_v2/src/edge_utils.c | grep curl
+      - name: 构建 APK
+        run: |
+         cd /opt/hin2n-android/Hin2n_android
+         #设置编译环境
+         #sudo apt-get install git automake libssl-dev make gcc
+         export JAVA_HOME=/opt/gcc/java/jdk1.8.0_202
+         export JRE_HOME=/opt/gcc/java/jdk1.8.0_202/jre
+         export CLASSPATH=.:$JAVA_HOME/lib:$JRE_HOME/lib:$CLASSPATH
+         export PATH=$JAVA_HOME/bin:$JRE_HOME/bin:$PATH
+         export ANDROID_HOME=/opt/gcc/Android/sdk
+         export ANDROID_NDK_HOME=$ANDROID_HOME/ndk-bundle
+         
+         #sed -i 's|6.3|6.9|g' ./gradle/wrapper/gradle-wrapper.properties
+         #sed -i 's|jcenter|mavenCentral|g' ./build.gradle
+         #sed -i '/minSdkVersion 17/i ndkVersion "23.2.8568313"' ./app/build.gradle
+         #sed -i '/compileSdkVersion 30/i ndkVersion "r21e"' ./app/build.gradle
+         #echo "UMENG_APPKEY=MHHjXcPbunWdzaWE3ZssDm+bNfkGkKbEi1YKNVN/fVUCpmAkYQ/xSiUfzPvwL/lkf119Lx6L7vdYfkuN8NRYYWabOkY7mzAenPGB44MvQLMnJ4+u+XMoQ7AlFunGtkVpSJUmFuth81m5xrtPrGZZyT9EVx7BN7Cxm+vf5gYGU1G9G0N8rLIK1r7DefZg01SM7rGGZX2lfTYLZpOrg/cOrmPHS+2+tGKC1yA2exxRQedOhf7BUJtJNDAzL1JlLP5UvxoBXYaFJKeok0GyutpnVWaJ0ROShyMUmfrioxM2ULJfETCHHBR7v9ufkdhjLGI1hFoYCRqrHd4QdCg9oTZNcaaXdfn4gkYbuj+i5FlGIK2iC8p5M0PS4q5Ngcioq35uYTBF1ZRZGoPDhDOrmgud1cFEbZxnJxM2cm3gQiwY/yA19BaU2F98qQYvfhG0ONsn3ommUlSujZOdaWG5G8pIec6PmQEXHOAgzvrBMq7jlx0fGLpeETRsc3b2Iko6bdG305S86Epu3/tRPRUJv8poBHX1wYD++zGOiYI+D2F530S51YroEne437wwyN3acAD1qH6tfSPmVVbzs6l+/N0JKu61s2djCN4Mk2La5MZUtKq9py0nRRaHfuCvXJ7s5sXeRzYVKsVDS3UcxlH6fa/h7tr0Bfahag1xjDvwxcVJzQc=" >>./gradle.properties
+         #echo "BUGLY_APPID=F6aWlzMBV8yLZIXfIBs22WiKAEF4hmLXAtIbYfT6dgC284dIyH7zb67sHHseK30t9XildVJT7S1cBZrvPYgDsmN/fefD3zW5CiYp5rmpEvklQDDehb7RFzCZnUxFLzycAwjsO6Ruze1Bk36zLdgJ+D6ayDpL4E9Q098yFdQBOPVQU0HHQOat5XMUPOxh4CV+Xh9RE0fD1IQcDlsieQeU8kq/CCmPhNPEtZYuTxL8mCmMf59TiLMLnlIl1MJXfgIlrvuLOwumWirqcSQ3/GS7I0u8ZV8Er1O7zUW/XcfL08p6cGoBOKqjzdi7anJU4CdoBrB7uA/feAWqp2oA6LziBdG6/+EPhVSRE13E4clEyfktv5JE2Oe/UcB48Q6859eSzArSYAyDsSn5PWjI82fFWlsfnB1NZuktNao47XcUvdD2ZpaywZ4ABmmm3rHy6LYy0L4KtNttQPhqmBih0pQf3Gl3fm8oZyJvWhP6ANoc8tBCG7Vl9gkM3HAe+KJhORgRxUFlDmL47gRQUwKqR8gmM54uPjHlT6YPUxOb96Zm42Vml4mA98bKGhqwQbMWeNBfQckf7JUgDJhB1oc9O096HitVDSKDEsuLcTDVwcfRXu8ZzxHgEC7PZzvytJ1ky5/v5JyxBpt6uGhEJHmUYyZI5eA0wm6mFOJtHOwcJZDhX0U=" >>./gradle.properties
+         #echo "SHARE_WX_APPID=uVKayK55wlnZwlnAUBu7Vbkx7IcxKujuqDNJlSRtwgqNV+dURQUezv+wP5h273w8rFL00rUq825xmMlnr0yt+nnoNOdWYhbW14HgiP8QS0xZnuOdJnB3OqqxlFXNt2/vFYbmWz+T97F85eAbXZPwK7dMaimWCBWdLkCgk0v2jyw3n0Bt1Satd8oCDG7YPqd1Ip9OFwbdQ6cOYTTV4vZQXiVaHu31wkqjMWu9Gl73peB8ZdcQY1uN+Zh1ko0tfKEWubTE+TsbZunMU3gjHf4Al4KuLi92ptXM5okXTEwgOVOUam4BF6TmGrYT0qrdiHkeUCQaRYWovLTlr+lMI6UafEGfTmsQfUCN3mF/7nH6VAQ3URiEeUQ1db7Tky2+2JE14iUH96BRUwmNwpQ4l018FHmWsE+QY6Y3sFr7E2ftvCzTqKNA2asTlQIDh0w7e7xQsuU80Xebrc71dpH2R9XPVL0KBfZqpSeElfhepBeizW3F5ZqC4oGQALcvhGzEH6lQIP6LaNnB/0erycdsRerZelFtZs6ehen1YRtHAJ3cPsTqTjjjN8MCF8I8omB7/NcdMYqIS34cR70Wyv+NzXmOSk42JMtJOrAcOA08jNf1Qg95qjjLcIDXzPgvrWEJmzEQdtVVQm5Hc++8Fl0ucT0NameWuj6PMtC/+33ZjaGkhXQ=" >>./gradle.properties
+         #echo "SHARE_WX_APPSECRET=cXaxqbFBrWjVbEDJIxCJzy6rpe2/tMCK5HFHfoXwoKVDVFc6WTDOOl3frv2w6vlA4LpOtUr4CcZ+17POjvrfz48MMiAYvN9oXLAmGyV5bUcCOCzjBrZAN1VtVHTqJiNBT++Xnl37UyTDAKH0wZuGhrdjlGhflXAGycTPP2t4QvD3q6UZP/wN6ORFQ+/Guq85N5GEhHBPv+V07z6HZWgVTyAMm6SUYvFJIlhzmQvjJK5K+2cBi1yDZT1V8QA1LOYLdcwia2O+/9YpTraJzsjtXcCEy65B+H90wwoWZ1OmhGJIXiXbdwKgYql2W0yLgF6V1gCRYE19L5PA6gjyy9ROAbEEurSeSKNvVyvoSkWYZ39oS8jRiQ77VSWh5Mxa6jAIWQblogAtZhOKy/b5AHsbpbsx/SeetC0W4chknt/yxweRBgqU5vuKrGmiFQ9ylLuWFOpYWuWTWpeBkep5EK9lB3ddV9LGpMu+/OiH+hj4owA3EATQ+LmChisNU8xrPKPqZjIViAdK+O6lNYjLMp2uRtTDoT+Cp+L1f1LGXG2cgvcZF9cPDky97VDr3D6IZP+0oF5rs7f4DPK8NLAu/fAsVbj6Ss6lD2VE7sVBPQKix0YC6Y33oJ4PB7BuPjYskn+pp8lKrAu7QHIm3YLxBZ3GALUs85Echh51QKJHIf40Jbc=" >>./gradle.properties
+         #echo "SHARE_WB_APPID=G8nPn1wxwgZVPKJJPm5zWh+1+Q4F/yBYUqJArmP8Ag1+TzYTWm/rLhoy2LczJpjHmI+5wR30+2NzlMfCDqBU/5s/qbALqIv5w50lW65W+KOn5TCxr/XWP2fmbVqXtTsDhvd9KjjPSBLfetKOCeHdbDKA++ebeXRQlo4jegw2m0mb7ZkuDFx0m+anpgmZYhU2Z77VcIeJcYSDUC9Rdqh2r4ZXoL2HlD4Wovy7XmL7NVZ/veuvoIeliGVTxTDRhmR8P3hmTJhI9Yf+DL2CFPSqO1/qua426n/iwYO90cwO+s2jkZ6RxD6z/wG7ysU5rEAaUXDRoHUZGd1CCqBEh1I1wg+mQHooS7FVXPazj2O2LJVXqG8aKKfoo2i3niNvs3vLEEhyITKfk5LXJeNNDktWxaFITMUhlk1lNtrqXYusCveD16eWBhNOYIXWTBl1oFg0EwAtvjyRZRLnGzc5ntHb6Xd6/hPhkNPBT8wZQxJQvS1iTc+U/nT21ZaKNDumIeRJrkOLD1yoPjlbf7XIRym5emzF1iloM/abkw0C2Ag8ctGHM5il3h1WbaCddYTAx2LEiRCEkAAjt7mOKj314gLHbIHH1YB8+jABg52DXEKkvMz4p9l9INxL9A65mblgHyOvtPBEkO9kTN2ALKh49twlgk27l7/Dcedvgtky5B7oXNE=" >>./gradle.properties
+         #echo "SHARE_WB_APPSECRET=cPprARKn13Sjrb8Li39CxMK/YCrKzO6ysVb3WJMGpldp3ebJTSKtycnwXB2/cXOHDjtwrfU5WgDiVxdNJQyG+lzKtJnMjOvfo0T3pVl54lRixQYuvK1eSxqbAM++w35eIEJX+xLAXd6ZsO4Z/e2cEUuNlvLDQny+NEmrHwnM5Iz7yfLWC+SSu7tH8zIlxRDTd94yT5VvcEj8zyZZ5i1nsdUE4CzJWHpylHVMUnHVJ6n2s1pCS3PDg/+4VIJ/UhpOTPaX5UsQYLY9MXeV3oFEy+1NLHE7OEqGzynlJwWn9i//O4FxzfYV5tnE/c2nGlNBwVAXMaxATArp1nnKrvfzEL3RxYDB+MIcXbpqbsf2SgS0PZhAy3r3t78QoVjX90LB53edTAxFimOznNX7kSryZio/zJaqmcFChtyJ0kFmOnRPlQadZmq5fCE1VlVSvX5++Kf5kc7elOjn75w+DInuqh7VpfQRpNLo4ItFkiX9pJPqQrwKQVFVXiMZvZTp4622FCaia8eDzUiogH/iAqu5u14SPD2dWNpx/v9DUf9IyBYRESCzCL3bSlUke9+aQ9GNs0E6km20+3P6p/fY9eGSeoBOh10OfFAuU3F9zkMqMEzSn/JLnAve/PicZ94mDGE+nkbxeGOzU62taDLqbjLWLikgLEDcRwO+KbEpxO2sQXc=" >>./gradle.properties
+         
+         #添加没有生效的定义
+         sed -i '/eee->last_sup = 0;/i int supernode_connect (n2n_edge_t *eee);' ./app/src/main/cpp/edge_jni/edge_android_v2.c
+         sed -i '/now = time(NULL);/i void send_query_peer (n2n_edge_t *eee, const n2n_mac_t dst_mac);' ./app/src/main/cpp/edge_jni/edge_android_v2.c
+         sed -i '/if(eee->conf.tuntap_ip_mode == TUNTAP_IP_MODE_SN_ASSIGN) {/i void send_register_super (n2n_edge_t *eee);' ./app/src/main/cpp/edge_jni/edge_android_v2.c
+         sed -i '/if(FD_ISSET(eee->sock, &socket_mask)) {/i int fetch_and_eventually_process_data (n2n_edge_t *eee, SOCKET sock, uint8_t *pktbuf, uint16_t *expected, uint16_t *position, time_t now);' ./app/src/main/cpp/edge_jni/edge_android_v2.c
+         
+         #检测报错的依赖插件
+         #gradle --warning-mode all
+         
+         #手动下载依赖插件
+         #./gradlew clean build --refresh-dependencies
+         
+         #bash ./gradlew assembleRelease
+         ./gradlew assemble
+      - name: 打包hin2n
+        run: |
+         cd /opt/hin2n-android/Hin2n_android/app/build/outputs/apk
+         ls -R .
+         #du -k app-release-unsigned.apk
+         mkdir -p /opt/hin2n
+         cd /opt
+         mv /opt/hin2n-android/Hin2n_android/app/build/outputs/apk/normalAllarch/debug/hin2n_v1.0-rc1_4_allarch_normal.apk /opt/hin2n/hin2n_v1.0-rc1_4_allarch_normal.apk
+         mv /opt/hin2n-android/Hin2n_android/app/build/outputs/apk/normalArm/debug/hin2n_v1.0-rc1_4_arm_normal.apk /opt/hin2n/hin2n_v1.0-rc1_4_arm_normal.apk
+         mv /opt/hin2n-android/Hin2n_android/app/build/outputs/apk/normalX86/debug/hin2n_v1.0-rc1_4_x86_normal.apk /opt/hin2n/hin2n_v1.0-rc1_4_x86_normal.apk
+         zip -r hin2n-android.zip /opt/hin2n
+      - name : 上传
+        uses: actions/upload-artifact@master
+        if: always()
+        with:
+         name: app
+         path: /opt/hin2n-android.zip
