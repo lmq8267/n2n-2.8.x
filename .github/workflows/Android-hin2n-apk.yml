@@ -17,10 +17,6 @@ jobs:
           #sudo chmod 777 -R /opt/gcc/
           #下载hin2n源码
           git clone https://github.com/switch-iot/hin2n.git --depth=1 --recurse-submodules /opt/hin2n-android
-          #替换n2n源码
-          rm -rf /opt/hin2n-android/bundles/n2n_ntop_v2/src/edge_utils.c
-          wget -c -q https://github.com/lmq8267/n2n-2.8.x/releases/download/toolchain/edge_utils.c -P /opt/hin2n-android/bundles/n2n_ntop_v2/src/
-          cat /opt/hin2n-android/bundles/n2n_ntop_v2/src/edge_utils.c | grep curl
       - name: 构建 APK
         run: |
          cd /opt/hin2n-android/Hin2n_android
